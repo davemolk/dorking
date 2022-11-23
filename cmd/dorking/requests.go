@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -13,10 +14,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func (d *dorking) makeRequest(url string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.config.timeout)*time.Millisecond)
-	defer cancel()
-
+func (d *dorking) makeRequest(ctx context.Context, url string) (io.ReadCloser, error) {
+	log.Printf("requesting %s\n", url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -30,13 +29,11 @@ func (d *dorking) makeRequest(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP response: %d for %s", resp.StatusCode, url)
 	}
 
-	return io.ReadAll(resp.Body)
+	return resp.Body, nil
 }
 
 func (d *dorking) randomUA() string {

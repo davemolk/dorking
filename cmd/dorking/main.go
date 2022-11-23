@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"log"
+	"regexp"
+	"time"
 )
 
 type config struct {
@@ -25,6 +29,7 @@ type config struct {
 
 type dorking struct {
 	config config
+	noBlank *regexp.Regexp
 }
 
 
@@ -48,10 +53,25 @@ func main() {
 	flag.IntVar(&config.timeout, "t", 5000, "timeout for request")
 	flag.Parse()
 
+	noBlank := regexp.MustCompile(`\s{2,}`)
+
 	d := &dorking{
 		config: config,
+		noBlank: noBlank,
 	}
 	
-	qdSlice := d.makeQueryData()
-	_ = qdSlice
+	urls := d.makeQueryStrings()
+	selectors := d.getSelectors()
+	if len(urls) != len(selectors) {
+		log.Fatal("mismatch between query urls and query data")
+	}
+	for i, u := range urls {
+		selectors[i].url = u
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.config.timeout)*time.Millisecond)
+	defer cancel()
+	
+	for _, s := range selectors {
+		d.parseData(ctx, s)
+	}
 }
