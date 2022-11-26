@@ -14,11 +14,11 @@ type selectors struct {
 	itemSelector  string
 	linkSelector  string
 	name          string
-	url string
+	url           string
 }
 
 func (d *dorking) getSelectors() []selectors {
-	var s []selectors
+	s := make([]selectors, 0, 3)
 
 	bing := selectors{
 		blurbSelector: "div.b_caption p",
@@ -27,6 +27,14 @@ func (d *dorking) getSelectors() []selectors {
 		name:          "bing",
 	}
 	s = append(s, bing)
+
+	brave := selectors{
+		blurbSelector: "div.snippet-content p.snippet-description",
+		itemSelector:  "div.fdb",
+		linkSelector:  "div.fdb > a.result-header",
+		name:          "brave",
+	}
+	s = append(s, brave)
 
 	ddg := selectors{
 		blurbSelector: "div.links_main > a",
@@ -48,7 +56,7 @@ func (d *dorking) parseData(ctx context.Context, s selectors) {
 	defer b.Close()
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
-		fmt.Println("no here", err)
+		fmt.Printf("unable to generate goquery doc: %v\n", err)
 		return
 	}
 	doc.Find(s.itemSelector).Each(func(_ int, g *goquery.Selection) {

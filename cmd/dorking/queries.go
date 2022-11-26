@@ -18,13 +18,14 @@ type queryData struct {
 	inurl    string
 	ip       string
 	nosite   string
+	not      string
 	related  string
 	site     string
 	spacer   string
 }
 
 func (d *dorking) getQueryData() []queryData {
-	var qdSlice []queryData
+	qdSlice := make([]queryData, 0, 3)
 
 	bing := queryData{
 		base:     "https://bing.com/search?q=",
@@ -39,10 +40,23 @@ func (d *dorking) getQueryData() []queryData {
 		inurl:    "inanchor%3A",
 		ip:       "ip%3A",
 		nosite:   "-site%3A",
+		not:      "-",
 		site:     "site%3A",
 		spacer:   "+",
 	}
 	qdSlice = append(qdSlice, bing)
+
+	// doesn't publish query info, so this is
+	// assembled from poking around...
+	brave := queryData{
+		base:   "https://search.brave.com/search?q=",
+		inurl:  "inurl%3A",
+		nosite: "-site:%3A",
+		not:    "-",
+		site:   "site:%3A",
+		spacer: "+",
+	}
+	qdSlice = append(qdSlice, brave)
 
 	ddg := queryData{
 		base:     "https://html.duckduckgo.com/html?q=",
@@ -50,6 +64,7 @@ func (d *dorking) getQueryData() []queryData {
 		intitle:  "intitle%3A",
 		inurl:    "inurl%3A",
 		nosite:   "-site%3A",
+		not:      "-",
 		site:     "site%3A",
 		spacer:   "+",
 	}
@@ -66,16 +81,15 @@ func (d *dorking) makeQueryStrings() []string {
 		var components []string
 		var cleanedQuery string
 		switch {
+		case d.config.exact:
+			cleanedQuery = strings.Replace(d.config.query, " ", qd.spacer, -1)
+			cleanedQuery = fmt.Sprintf("\"%s\"", cleanedQuery)
+			components = append(components, cleanedQuery)
 		case d.config.query != "":
 			cleanedQuery = strings.Replace(d.config.query, " ", qd.spacer, -1)
 			components = append(components, cleanedQuery)
-		case d.config.queryExact != "":
-			cleanedQuery = strings.Replace(d.config.queryExact, " ", qd.spacer, -1)
-			cleanedQuery = fmt.Sprintf("\"%s\"", cleanedQuery)
-			components = append(components, cleanedQuery)
 		}
 
-		// better way to do this?
 		if d.config.contains != "" && qd.contains != "" {
 			contains := fmt.Sprintf("%s%s", qd.contains, d.config.contains)
 			components = append(components, contains)
@@ -126,9 +140,15 @@ func (d *dorking) makeQueryStrings() []string {
 			components = append(components, ip)
 		}
 
-		if d.config.nosite != "" && qd.nosite != "" {
-			nosite := fmt.Sprintf("%s%s", qd.nosite, d.config.nosite)
+		if d.config.notsite != "" && qd.nosite != "" {
+			nosite := fmt.Sprintf("%s%s", qd.nosite, d.config.notsite)
 			components = append(components, nosite)
+		}
+
+		if d.config.not != "" && qd.not != "" {
+			cleanedQuery = strings.Replace(d.config.not, " ", qd.spacer, -1)
+			cleanedQuery = fmt.Sprintf("%s%s", "-", cleanedQuery)
+			components = append(components, cleanedQuery)
 		}
 
 		if d.config.related != "" && qd.related != "" {
