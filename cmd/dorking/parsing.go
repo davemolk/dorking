@@ -18,7 +18,7 @@ type selectors struct {
 }
 
 func (d *dorking) getSelectors() []selectors {
-	s := make([]selectors, 0, 3)
+	s := make([]selectors, 0, 4)
 
 	bing := selectors{
 		blurbSelector: "div.b_caption p",
@@ -43,6 +43,14 @@ func (d *dorking) getSelectors() []selectors {
 		name:          "duck",
 	}
 	s = append(s, ddg)
+	
+	yahoo := selectors{
+		blurbSelector: "div.compText",
+		itemSelector:  "div.algo",
+		linkSelector:  "h3 > a",
+		name:          "yahoo",
+	}
+	s = append(s, yahoo)
 
 	return s
 }

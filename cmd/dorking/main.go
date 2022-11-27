@@ -21,9 +21,9 @@ type config struct {
 	inurl    string
 	ip       string
 	not      string
-	notsite   string
+	notsite  string
+	or       string
 	query    string
-	related  string
 	site     string
 	timeout  int
 }
@@ -48,8 +48,8 @@ func main() {
 	flag.StringVar(&config.ip, "ip", "", "return sites hosted by specific ip")
 	flag.StringVar(&config.notsite, "notsite", "", "site/domain to exclude")
 	flag.StringVar(&config.not, "not", "", "term(s) to exclude")
+	flag.StringVar(&config.or, "or", "", "OR term(s)")
 	flag.StringVar(&config.query, "q", "", "search query")
-	flag.StringVar(&config.related, "related", "", "return sites similar to input site")
 	flag.StringVar(&config.site, "site", "", "site/domain to search")
 	flag.IntVar(&config.timeout, "t", 5000, "timeout for request")
 	flag.Parse()

@@ -17,15 +17,16 @@ type queryData struct {
 	intitle  string
 	inurl    string
 	ip       string
-	nosite   string
+	name     string
 	not      string
-	related  string
+	notsite  string
+	or       string
 	site     string
 	spacer   string
 }
 
 func (d *dorking) getQueryData() []queryData {
-	qdSlice := make([]queryData, 0, 3)
+	qdSlice := make([]queryData, 0, 4)
 
 	bing := queryData{
 		base:     "https://bing.com/search?q=",
@@ -39,8 +40,10 @@ func (d *dorking) getQueryData() []queryData {
 		intitle:  "intitle%3A",
 		inurl:    "inanchor%3A",
 		ip:       "ip%3A",
-		nosite:   "-site%3A",
+		name:     "bing",
+		notsite:  "-site%3A",
 		not:      "-",
+		or:       "OR",
 		site:     "site%3A",
 		spacer:   "+",
 	}
@@ -49,12 +52,14 @@ func (d *dorking) getQueryData() []queryData {
 	// doesn't publish query info, so this is
 	// assembled from poking around...
 	brave := queryData{
-		base:   "https://search.brave.com/search?q=",
-		inurl:  "inurl%3A",
-		nosite: "-site:%3A",
-		not:    "-",
-		site:   "site:%3A",
-		spacer: "+",
+		base:    "https://search.brave.com/search?q=",
+		inurl:   "inurl%3A",
+		name:    "brave",
+		notsite: "-site:%3A",
+		not:     "-",
+		or:      "OR",
+		site:    "site:%3A",
+		spacer:  "+",
 	}
 	qdSlice = append(qdSlice, brave)
 
@@ -63,19 +68,36 @@ func (d *dorking) getQueryData() []queryData {
 		filetype: "filetype%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inurl%3A",
-		nosite:   "-site%3A",
+		name:     "duckduckgo",
+		notsite:  "-site%3A",
 		not:      "-",
+		or:       "OR",
 		site:     "site%3A",
 		spacer:   "+",
 	}
 	qdSlice = append(qdSlice, ddg)
+
+	// has a bunch of weird query params but it seems like
+	// just specifying within p works...
+	yahoo := queryData{
+		base:     "https://search.yahoo.com/search?p=",
+		filetype: "filetype%3A",
+		intitle:  "intitle%3A",
+		inurl:    "inurl%3A",
+		name:     "yahoo",
+		not:      "-",
+		or:       "OR",
+		site:     "site%3A",
+		spacer:   "+",
+	}
+	qdSlice = append(qdSlice, yahoo)
 
 	return qdSlice
 }
 
 func (d *dorking) makeQueryStrings() []string {
 	qdSlice := d.getQueryData()
-	var urls []string
+	urls := make([]string, 0, len(qdSlice))
 	for _, qd := range qdSlice {
 		var url string
 		var components []string
@@ -140,20 +162,21 @@ func (d *dorking) makeQueryStrings() []string {
 			components = append(components, ip)
 		}
 
-		if d.config.notsite != "" && qd.nosite != "" {
-			nosite := fmt.Sprintf("%s%s", qd.nosite, d.config.notsite)
-			components = append(components, nosite)
-		}
-
 		if d.config.not != "" && qd.not != "" {
 			cleanedQuery = strings.Replace(d.config.not, " ", qd.spacer, -1)
-			cleanedQuery = fmt.Sprintf("%s%s", "-", cleanedQuery)
+			cleanedQuery = fmt.Sprintf("%s%s", qd.not, cleanedQuery)
 			components = append(components, cleanedQuery)
 		}
 
-		if d.config.related != "" && qd.related != "" {
-			related := fmt.Sprintf("%s%s", qd.related, d.config.related)
-			components = append(components, related)
+		if d.config.notsite != "" && qd.notsite != "" {
+			notsite := fmt.Sprintf("%s%s", qd.notsite, d.config.notsite)
+			components = append(components, notsite)
+		}
+
+		if d.config.or != "" && qd.or != "" {
+			cleanedQuery = strings.Replace(d.config.or, " ", qd.spacer, -1)
+			cleanedQuery = fmt.Sprintf("%s%s", qd.or, cleanedQuery)
+			components = append(components, cleanedQuery)
 		}
 
 		if d.config.site != "" && qd.site != "" {
