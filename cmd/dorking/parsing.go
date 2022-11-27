@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -55,16 +56,17 @@ func (d *dorking) getSelectors() []selectors {
 	return s
 }
 
-func (d *dorking) parseData(ctx context.Context, s selectors) {
+func (d *dorking) parseData(ctx context.Context, wg *sync.WaitGroup, s selectors) {
+	defer wg.Done()
 	b, err := d.makeRequest(ctx, s.url)
 	if err != nil {
-		fmt.Println("here", err)
+		fmt.Printf("unable to make request for %s\n", s.name)
 		return
 	}
 	defer b.Close()
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
-		fmt.Printf("unable to generate goquery doc: %v\n", err)
+		fmt.Printf("unable to generate goquery doc for %s: %v\n", s.name, err)
 		return
 	}
 	doc.Find(s.itemSelector).Each(func(_ int, g *goquery.Selection) {
@@ -102,6 +104,12 @@ func (d *dorking) cleanLinks(s string) string {
 		removePrefix := strings.Split(u, "=")
 		u = removePrefix[1]
 		removeSuffix := strings.Split(u, "&rut")
+		u = removeSuffix[0]
+	}
+	if strings.HasPrefix(u, "https://r.search.yahoo.com/") {
+		removePrefix := strings.Split(u, "/RU=")
+		u = removePrefix[1]
+		removeSuffix := strings.Split(u, "/RK=")
 		u = removeSuffix[0]
 	}
 	return u

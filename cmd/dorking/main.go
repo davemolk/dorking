@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"regexp"
+	"sync"
 	"time"
 )
 
@@ -72,7 +73,10 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.config.timeout)*time.Millisecond)
 	defer cancel()
 
+	var wg sync.WaitGroup
+	wg.Add(len(selectors))
 	for _, s := range selectors {
-		d.parseData(ctx, s)
+		go d.parseData(ctx, &wg, s)
 	}
+	wg.Wait()
 }
