@@ -80,6 +80,9 @@ func (d *dorking) parseData(ctx context.Context, wg *sync.WaitGroup, s selectors
 				fmt.Printf("can't get blurb for %s\n", s.name)
 			}
 			cleanBlurb := d.cleanBlurb(blurb)
+			if d.config.verbose {
+				d.output(cleanLink, cleanBlurb)
+			}
 			d.searches.store(cleanLink, cleanBlurb)
 		}
 	})
@@ -111,4 +114,14 @@ func (d *dorking) cleanLinks(s string) string {
 		u = removeSuffix[0]
 	}
 	return u
+}
+
+func (d *dorking) output(cleanLink, cleanBlurb string) {
+	fmt.Println()
+	fmt.Println(cleanLink)
+	if len(cleanBlurb) > 200 {
+		cleanBlurb = cleanBlurb[:200]
+	}
+	fmt.Println(cleanBlurb)
+	fmt.Println()
 }

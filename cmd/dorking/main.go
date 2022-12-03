@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"log"
-	"os"
 	"regexp"
 	"sync"
 	"time"
@@ -23,12 +21,14 @@ type config struct {
 	intitle  string
 	inurl    string
 	ip       string
+	json bool
 	not      string
 	notsite  string
 	or       string
 	query    string
 	site     string
 	timeout  int
+	verbose bool
 }
 
 type dorking struct {
@@ -50,12 +50,14 @@ func main() {
 	flag.StringVar(&config.intitle, "intitle", "", "return sites with search term(s) in site title")
 	flag.StringVar(&config.inurl, "inurl", "", "return sites with search term(s) in site URL")
 	flag.StringVar(&config.ip, "ip", "", "return sites hosted by specific ip")
+	flag.BoolVar(&config.json, "json", false, "write results to json")
 	flag.StringVar(&config.notsite, "notsite", "", "site/domain to exclude")
 	flag.StringVar(&config.not, "not", "", "term(s) to exclude")
 	flag.StringVar(&config.or, "or", "", "OR term(s)")
 	flag.StringVar(&config.query, "q", "", "search query")
 	flag.StringVar(&config.site, "site", "", "site/domain to search")
 	flag.IntVar(&config.timeout, "t", 5000, "timeout for request")
+	flag.BoolVar(&config.verbose, "v", true, "print search results to stdout")
 	flag.Parse()
 
 	noBlank := regexp.MustCompile(`\s{2,}`)
@@ -84,12 +86,10 @@ func main() {
 		go d.parseData(ctx, &wg, s)
 	}
 	wg.Wait()
-	data, err := json.MarshalIndent(d.searches.searches, "", "  ")
-	if err != nil {
-		log.Println(err)
-	}
-	err = os.WriteFile("results.json", data, 0644)
-	if err != nil {
-		log.Println(err)
+
+	if config.json {
+		if err := d.write(); err != nil {
+			log.Fatalf("unable to write file: %v", err)
+		}
 	}
 }
