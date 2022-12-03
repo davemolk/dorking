@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"log"
+	"os"
 	"regexp"
 	"sync"
 	"time"
@@ -32,6 +34,7 @@ type config struct {
 type dorking struct {
 	config  config
 	noBlank *regexp.Regexp
+	searches *searchMap
 }
 
 func main() {
@@ -56,10 +59,12 @@ func main() {
 	flag.Parse()
 
 	noBlank := regexp.MustCompile(`\s{2,}`)
+	searches := newSearchMap()
 
 	d := &dorking{
 		config:  config,
 		noBlank: noBlank,
+		searches: searches,
 	}
 
 	urls := d.makeQueryStrings()
@@ -79,4 +84,12 @@ func main() {
 		go d.parseData(ctx, &wg, s)
 	}
 	wg.Wait()
+	data, err := json.MarshalIndent(d.searches.searches, "", "  ")
+	if err != nil {
+		log.Println(err)
+	}
+	err = os.WriteFile("results.json", data, 0644)
+	if err != nil {
+		log.Println(err)
+	}
 }

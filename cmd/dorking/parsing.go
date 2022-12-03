@@ -75,14 +75,12 @@ func (d *dorking) parseData(ctx context.Context, wg *sync.WaitGroup, s selectors
 			return
 		} else {
 			cleanLink := d.cleanLinks(link)
-			fmt.Println(cleanLink)
 			blurb := g.Find(s.blurbSelector).Text()
 			if blurb == "" {
 				fmt.Printf("can't get blurb for %s\n", s.name)
 			}
 			cleanBlurb := d.cleanBlurb(blurb)
-			fmt.Println(cleanBlurb)
-			fmt.Println()
+			d.searches.store(cleanLink, cleanBlurb)
 		}
 	})
 }
