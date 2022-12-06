@@ -10,15 +10,18 @@ import (
 	"time"
 )
 
+// seed random number generator to get random user agents
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
 func (d *dorking) makeRequest(ctx context.Context, url string) (io.ReadCloser, error) {
-	log.Printf("requesting %s\n", url)
+	if d.config.verbose {
+		log.Printf("requesting %s\n", url)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't make request for %s: %v", url, err)
 	}
 
 	uAgent := d.randomUA()
@@ -26,7 +29,7 @@ func (d *dorking) makeRequest(ctx context.Context, url string) (io.ReadCloser, e
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't get response for %s: %v", url, err)
 	}
 
 	if resp.StatusCode != 200 {

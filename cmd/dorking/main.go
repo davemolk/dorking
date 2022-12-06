@@ -21,19 +21,19 @@ type config struct {
 	intitle  string
 	inurl    string
 	ip       string
-	json bool
+	json     bool
 	not      string
 	notsite  string
 	or       string
 	query    string
 	site     string
 	timeout  int
-	verbose bool
+	verbose  bool
 }
 
 type dorking struct {
-	config  config
-	noBlank *regexp.Regexp
+	config   config
+	noBlank  *regexp.Regexp
 	searches *searchMap
 }
 
@@ -57,15 +57,15 @@ func main() {
 	flag.StringVar(&config.query, "q", "", "search query")
 	flag.StringVar(&config.site, "site", "", "site/domain to search")
 	flag.IntVar(&config.timeout, "t", 5000, "timeout for request")
-	flag.BoolVar(&config.verbose, "v", true, "print search results to stdout")
+	flag.BoolVar(&config.verbose, "v", false, "chatty mode")
 	flag.Parse()
 
 	noBlank := regexp.MustCompile(`\s{2,}`)
 	searches := newSearchMap()
 
 	d := &dorking{
-		config:  config,
-		noBlank: noBlank,
+		config:   config,
+		noBlank:  noBlank,
 		searches: searches,
 	}
 

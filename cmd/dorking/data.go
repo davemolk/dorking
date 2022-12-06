@@ -9,7 +9,7 @@ import (
 )
 
 type searchMap struct {
-	mu sync.Mutex
+	mu       sync.Mutex
 	searches map[string]string
 }
 
