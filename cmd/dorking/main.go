@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 	"regexp"
 	"sync"
-	"time"
 )
 
 type config struct {
@@ -77,13 +75,11 @@ func main() {
 	for i, u := range urls {
 		selectors[i].url = u
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.config.timeout)*time.Millisecond)
-	defer cancel()
-
+	
 	var wg sync.WaitGroup
 	wg.Add(len(selectors))
 	for _, s := range selectors {
-		go d.parseData(ctx, &wg, s)
+		go d.parseData(&wg, s)
 	}
 	wg.Wait()
 

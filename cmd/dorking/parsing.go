@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -54,16 +53,16 @@ func (d *dorking) getSelectors() []selectors {
 	return s
 }
 
-func (d *dorking) parseData(ctx context.Context, wg *sync.WaitGroup, s selectors) {
+func (d *dorking) parseData(wg *sync.WaitGroup, s selectors) {
 	defer wg.Done()
-	b, err := d.makeRequest(ctx, s.url)
+	b, err := d.makeRequest(s.url)
 	if err != nil {
 		if d.config.verbose {
 			fmt.Printf("unable to make request for %s\n", s.name)
 		}
 		return
 	}
-	defer b.Close()
+	// defer b.Close()
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
 		if d.config.verbose {

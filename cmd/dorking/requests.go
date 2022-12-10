@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -15,13 +16,16 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func (d *dorking) makeRequest(ctx context.Context, url string) (io.ReadCloser, error) {
+func (d *dorking) makeRequest(url string) (*bytes.Buffer, error) {
 	if d.config.verbose {
 		log.Printf("requesting %s\n", url)
 	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(d.config.timeout)*time.Millisecond)
+	defer cancel()
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("can't make request for %s: %v", url, err)
+		return nil, fmt.Errorf("couldn't make request for %s: %v", url, err)
 	}
 
 	uAgent := d.randomUA()
@@ -29,14 +33,19 @@ func (d *dorking) makeRequest(ctx context.Context, url string) (io.ReadCloser, e
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("can't get response for %s: %v", url, err)
+		return nil, fmt.Errorf("couldn't get response for %s: %v", url, err)
 	}
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP response: %d for %s", resp.StatusCode, url)
 	}
 
-	return resp.Body, nil
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read body for %s: %v", url, err)
+	}
+	buf := bytes.NewBuffer(b)
+	return buf, nil
 }
 
 func (d *dorking) randomUA() string {
