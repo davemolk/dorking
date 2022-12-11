@@ -36,10 +36,18 @@ func (d *dorking) encode(data map[string]string) ([]byte, error) {
 	return bytes.TrimRight(buf.Bytes(), "\n"), err
 }
 
-func (d *dorking) write() error {
+func (d *dorking) json() ([]byte, error) {
 	data, err := d.encode(d.searches.searches)
 	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
+		return nil, fmt.Errorf("encoding error: %w", err)
+	}
+	return data, nil
+}
+
+func (d *dorking) write() error {
+	data, err := d.json()
+	if err != nil {
+		return fmt.Errorf("unable to get json: %w", err)
 	}
 	err = os.WriteFile("results.json", data, 0644)
 	if err != nil {

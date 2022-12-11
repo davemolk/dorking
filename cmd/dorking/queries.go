@@ -13,7 +13,6 @@ type queryData struct {
 	filetype string
 	hasfeed  string
 	inbody   string
-	info     string
 	intitle  string
 	inurl    string
 	ip       string
@@ -38,7 +37,6 @@ func (d *dorking) getQueryData() []queryData {
 		filetype: "filetype%3A",
 		hasfeed:  "hasfeed%3A",
 		inbody:   "inbody%3A",
-		info:     "info%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inanchor%3A",
 		ip:       "ip%3A",
@@ -134,10 +132,6 @@ func (d *dorking) makeQueryStrings() []string {
 		if d.config.inbody != "" && qd.inbody != "" {
 			inbody := fmt.Sprintf("%s%s", qd.inbody, d.config.inbody)
 			components = append(components, inbody)
-		}
-		if d.config.info != "" && qd.info != "" {
-			info := fmt.Sprintf("%s%s", qd.info, d.config.info)
-			components = append(components, info)
 		}
 		if d.config.intitle != "" && qd.intitle != "" {
 			intitle := fmt.Sprintf("%s%s", qd.intitle, d.config.intitle)

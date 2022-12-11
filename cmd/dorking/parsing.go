@@ -62,14 +62,16 @@ func (d *dorking) parseData(b *bytes.Buffer, s selectors) {
 		return
 	}
 	doc.Find(s.itemSelector).Each(func(_ int, g *goquery.Selection) {
-		link, ok := g.Find(s.linkSelector).Attr("href") 
+		link, ok := g.Find(s.linkSelector).Attr("href")
 		if !ok {
 			return
-		} 
+		}
 		cleanedLink := d.cleanLinks(link)
 		blurb := g.Find(s.blurbSelector).Text()
 		cleanedBlurb := d.cleanBlurb(blurb)
-		d.output(cleanedLink, cleanedBlurb)
+		if !d.config.json {
+			d.output(cleanedLink, cleanedBlurb)
+		}
 		d.searches.store(cleanedLink, cleanedBlurb)
 	})
 }
