@@ -57,7 +57,7 @@ func (d *dorking) parseData(b *bytes.Buffer, s selectors) {
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
 		if d.config.verbose {
-			fmt.Printf("unable to generate goquery doc for %s: %v\n", s.name, err)
+			d.errorLog.Printf("unable to generate goquery doc for %s: %v\n", s.name, err)
 		}
 		return
 	}
@@ -85,7 +85,7 @@ func (d *dorking) cleanLinks(s string) string {
 	u, err := url.QueryUnescape(s)
 	if err != nil {
 		if d.config.verbose {
-			fmt.Printf("unable to clean %s: %v\n", s, err)
+			d.errorLog.Printf("unable to clean %s: %v\n", s, err)
 		}
 		return s
 	}

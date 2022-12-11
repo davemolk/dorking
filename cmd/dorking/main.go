@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"sync"
 )
@@ -32,6 +32,7 @@ type config struct {
 
 type dorking struct {
 	config   config
+	errorLog *log.Logger
 	noBlank  *regexp.Regexp
 	searches *searchMap
 }
@@ -59,11 +60,13 @@ func main() {
 	flag.BoolVar(&config.verbose, "v", false, "chatty mode")
 	flag.Parse()
 
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ltime|log.Lshortfile)
 	noBlank := regexp.MustCompile(`\s{2,}`)
 	searches := newSearchMap()
 
 	d := &dorking{
 		config:   config,
+		errorLog: errorLog,
 		noBlank:  noBlank,
 		searches: searches,
 	}
@@ -78,7 +81,7 @@ func main() {
 			b, err := d.makeRequest(s.url)
 			if err != nil {
 				if d.config.verbose {
-					fmt.Printf("unable to make request for %s\n", s.name)
+					errorLog.Printf("unable to make request for %s\n", s.name)
 				}
 				return
 			}
@@ -89,7 +92,7 @@ func main() {
 
 	if config.json {
 		if err := d.write(); err != nil {
-			log.Fatalf("unable to write file: %v", err)
+			errorLog.Fatalf("unable to write file: %v", err)
 		}
 	}
 }

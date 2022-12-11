@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -182,7 +181,7 @@ func (d *dorking) selectorSlice() []selectors {
 	urls := d.makeQueryStrings()
 	selectorSlice := d.getSelectors()
 	if len(urls) != len(selectorSlice) {
-		log.Fatal("mismatch between query urls and query data")
+		d.errorLog.Fatal("mismatch between query urls and query data")
 	}
 	for i, u := range urls {
 		selectorSlice[i].url = u
