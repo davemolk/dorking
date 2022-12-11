@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/url"
 	"strings"
-	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -53,16 +53,7 @@ func (d *dorking) getSelectors() []selectors {
 	return s
 }
 
-func (d *dorking) parseData(wg *sync.WaitGroup, s selectors) {
-	defer wg.Done()
-	b, err := d.makeRequest(s.url)
-	if err != nil {
-		if d.config.verbose {
-			fmt.Printf("unable to make request for %s\n", s.name)
-		}
-		return
-	}
-	// defer b.Close()
+func (d *dorking) parseData(b *bytes.Buffer, s selectors) {
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
 		if d.config.verbose {

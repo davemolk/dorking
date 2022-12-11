@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"regexp"
 	"sync"
@@ -67,19 +68,22 @@ func main() {
 		searches: searches,
 	}
 
-	urls := d.makeQueryStrings()
-	selectors := d.getSelectors()
-	if len(urls) != len(selectors) {
-		log.Fatal("mismatch between query urls and query data")
-	}
-	for i, u := range urls {
-		selectors[i].url = u
-	}
+	selectorSlice := d.selectorSlice()
 	
 	var wg sync.WaitGroup
-	wg.Add(len(selectors))
-	for _, s := range selectors {
-		go d.parseData(&wg, s)
+	wg.Add(len(selectorSlice))
+	for _, s := range selectorSlice {
+		go func (s selectors) {
+			defer wg.Done()
+			b, err := d.makeRequest(s.url)
+			if err != nil {
+				if d.config.verbose {
+					fmt.Printf("unable to make request for %s\n", s.name)
+				}
+				return
+			}
+			d.parseData(b, s)
+		}(s)
 	}
 	wg.Wait()
 
