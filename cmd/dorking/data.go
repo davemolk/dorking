@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"os"
 	"sync"
 )
 
@@ -41,17 +39,4 @@ func (d *dorking) json(data map[string]string) ([]byte, error) {
 	e.SetIndent("", "    ")
 	err := e.Encode(data)
 	return bytes.TrimRight(buf.Bytes(), "\n"), err
-}
-
-// write saves the search results to a json file.
-func (d *dorking) write(data map[string]string) error {
-	js, err := d.json(data)
-	if err != nil {
-		return fmt.Errorf("unable to encode to json: %w", err)
-	}
-	err = os.WriteFile("results.json", js, 0644)
-	if err != nil {
-		return fmt.Errorf("writing error: %w", err)
-	}
-	return nil
 }

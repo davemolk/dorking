@@ -91,17 +91,18 @@ func main() {
 	}
 	wg.Wait()
 
-	if config.json {
-		data, err := d.json(d.searches.searches)
+	if config.json || config.write {
+		b, err := d.json(d.searches.searches)
 		if err != nil {
 			errorLog.Fatal("unable to get json:", err)
 		}
-		fmt.Println(string(data))
-	}
-
-	if config.write {
-		if err := d.write(d.searches.searches); err != nil {
-			errorLog.Fatalf("unable to write file: %v", err)
+		if config.json {
+			fmt.Println(string(b))
+		}
+		if config.write {
+			if err := os.WriteFile("results.json", b, 0644); err != nil {
+				errorLog.Printf("writing error: %v\n", err)
+			}
 		}
 	}
 }
