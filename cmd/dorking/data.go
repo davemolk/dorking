@@ -8,17 +8,22 @@ import (
 	"sync"
 )
 
+// searchMap contains a mutex-protected map for storing search
+// results (formatted as URL:blurb).
 type searchMap struct {
 	mu       sync.Mutex
 	searches map[string]string
 }
 
+// newSearchMap initializes and returns a new searchMap.
 func newSearchMap() *searchMap {
 	return &searchMap{
 		searches: make(map[string]string),
 	}
 }
 
+// store checks if a URL has already been stored. If it hasn't,
+// both the URL and the associated blurb will be stored.
 func (s *searchMap) store(url, blurb string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -27,7 +32,9 @@ func (s *searchMap) store(url, blurb string) {
 	}
 }
 
-func (d *dorking) encode(data map[string]string) ([]byte, error) {
+// json encodes the search results to json and returns
+// a byte slice and any errors.
+func (d *dorking) json(data map[string]string) ([]byte, error) {
 	buf := &bytes.Buffer{}
 	e := json.NewEncoder(buf)
 	e.SetEscapeHTML(false)
@@ -36,20 +43,13 @@ func (d *dorking) encode(data map[string]string) ([]byte, error) {
 	return bytes.TrimRight(buf.Bytes(), "\n"), err
 }
 
-func (d *dorking) json() ([]byte, error) {
-	data, err := d.encode(d.searches.searches)
+// write saves the search results to a json file.
+func (d *dorking) write(data map[string]string) error {
+	js, err := d.json(data)
 	if err != nil {
-		return nil, fmt.Errorf("encoding error: %w", err)
+		return fmt.Errorf("unable to encode to json: %w", err)
 	}
-	return data, nil
-}
-
-func (d *dorking) write() error {
-	data, err := d.json()
-	if err != nil {
-		return fmt.Errorf("unable to get json: %w", err)
-	}
-	err = os.WriteFile("results.json", data, 0644)
+	err = os.WriteFile("results.json", js, 0644)
 	if err != nil {
 		return fmt.Errorf("writing error: %w", err)
 	}

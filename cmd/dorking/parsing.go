@@ -9,6 +9,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// selectors is a struct containing the necessary information
+// to parse the search engine results for each URL and blurb.
 type selectors struct {
 	blurbSelector string
 	itemSelector  string
@@ -17,6 +19,8 @@ type selectors struct {
 	url           string
 }
 
+// getSelectors returns a slice of selectors consisting of one
+// selector struct for each of the search engines.
 func (d *dorking) getSelectors() []selectors {
 	s := make([]selectors, 0, 4)
 
@@ -53,6 +57,9 @@ func (d *dorking) getSelectors() []selectors {
 	return s
 }
 
+// parseData creates and parses a goquery document for the
+// result URLs and blurbs. These are stored in the searchMap
+// and printed to stdout (unless the -j flag is true).
 func (d *dorking) parseData(b *bytes.Buffer, s selectors) {
 	doc, err := goquery.NewDocumentFromReader(b)
 	if err != nil {
@@ -70,12 +77,13 @@ func (d *dorking) parseData(b *bytes.Buffer, s selectors) {
 		blurb := g.Find(s.blurbSelector).Text()
 		cleanedBlurb := d.cleanBlurb(blurb)
 		if !d.config.json {
-			d.output(cleanedLink, cleanedBlurb)
+			d.printStdout(cleanedLink, cleanedBlurb)
 		}
 		d.searches.store(cleanedLink, cleanedBlurb)
 	})
 }
 
+// cleanBlurb removes any extraneous whitespace and \n from a string.
 func (d *dorking) cleanBlurb(s string) string {
 	cleanB := d.noBlank.ReplaceAllString(s, " ")
 	cleanB = strings.TrimSpace(cleanB)
@@ -83,6 +91,8 @@ func (d *dorking) cleanBlurb(s string) string {
 	return cleanB
 }
 
+// cleanLinks strips any unnecessary information added to the result
+// links by duck duck go and yahoo.
 func (d *dorking) cleanLinks(s string) string {
 	u, err := url.QueryUnescape(s)
 	if err != nil {
@@ -109,7 +119,9 @@ func (d *dorking) cleanLinks(s string) string {
 	return u
 }
 
-func (d *dorking) output(cleanLink, cleanBlurb string) {
+// printStdout truncates any blurb with a length longer
+// than 200 and prints to stdout.
+func (d *dorking) printStdout(cleanLink, cleanBlurb string) {
 	fmt.Println(cleanLink)
 	if len(cleanBlurb) > 200 {
 		cleanBlurb = cleanBlurb[:200]

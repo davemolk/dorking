@@ -16,6 +16,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// makeRequest takes in a URL, makes a GET request, and returns
+// the results as a *bytes.Buffer (along with any errors).
 func (d *dorking) makeRequest(url string) (*bytes.Buffer, error) {
 	if d.config.verbose {
 		log.Printf("requesting %s\n", url)
@@ -48,12 +50,14 @@ func (d *dorking) makeRequest(url string) (*bytes.Buffer, error) {
 	return buf, nil
 }
 
+// randomUA picks a random user agent obtained from getUA and returns it.
 func (d *dorking) randomUA() string {
 	userAgents := d.getUA()
 	random := rand.Intn(len(userAgents))
 	return userAgents[random]
 }
 
+// getUA returns a string slice of ten user agents.
 func (d *dorking) getUA() []string {
 	return []string{
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36",

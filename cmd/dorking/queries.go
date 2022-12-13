@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// queryData is a struct containing the possible components
+// to be used in constructing query strings.
 type queryData struct {
 	base     string
 	contains string
@@ -61,6 +63,7 @@ func (d *dorking) getQueryData() []queryData {
 		spacer:  "+",
 	}
 
+	// quack quack quack mr ducksworth
 	ddg := queryData{
 		base:     "https://html.duckduckgo.com/html?q=",
 		filetype: "filetype%3A",
@@ -93,6 +96,8 @@ func (d *dorking) getQueryData() []queryData {
 	return qdSlice
 }
 
+// makeQueryStrings returns a slice of query strings
+// specified for each search engine.
 func (d *dorking) makeQueryStrings() []string {
 	qdSlice := d.getQueryData()
 	urls := make([]string, 0, len(qdSlice))
@@ -171,6 +176,8 @@ func (d *dorking) makeQueryStrings() []string {
 	return urls
 }
 
+// selectorSlice adds the search query URL to each search engine
+// selector and returns the results as a selector slice.
 func (d *dorking) selectorSlice() []selectors {
 	urls := d.makeQueryStrings()
 	selectorSlice := d.getSelectors()

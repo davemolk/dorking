@@ -92,7 +92,7 @@ func main() {
 	wg.Wait()
 
 	if config.json {
-		data, err := d.json()
+		data, err := d.json(d.searches.searches)
 		if err != nil {
 			errorLog.Fatal("unable to get json:", err)
 		}
@@ -100,7 +100,7 @@ func main() {
 	}
 
 	if config.write {
-		if err := d.write(); err != nil {
+		if err := d.write(d.searches.searches); err != nil {
 			errorLog.Fatalf("unable to write file: %v", err)
 		}
 	}
