@@ -12,14 +12,11 @@ import (
 type config struct {
 	contains string
 	exact    bool
-	ext      string
 	feed     string
 	filetype string
-	hasfeed  string
 	inbody   string
 	intitle  string
 	inurl    string
-	ip       string
 	json     bool
 	not      string
 	notsite  string
@@ -42,14 +39,11 @@ func main() {
 	var config config
 	flag.StringVar(&config.contains, "contains", "", "return sites with links to specified file types")
 	flag.BoolVar(&config.exact, "exact", false, "match exact words")
-	flag.StringVar(&config.ext, "ext", "", "return sites with specified file name extension")
 	flag.StringVar(&config.feed, "feed", "", "return RSS or Atom feeds for search term(s)")
 	flag.StringVar(&config.filetype, "filetype", "", "file type")
-	flag.StringVar(&config.hasfeed, "hasfeed", "", "return sites with RSS or Atom feeds for search term(s)")
 	flag.StringVar(&config.inbody, "inbody", "", "return sites with search term(s) in body")
 	flag.StringVar(&config.intitle, "intitle", "", "return sites with search term(s) in site title")
 	flag.StringVar(&config.inurl, "inurl", "", "return sites with search term(s) in site URL")
-	flag.StringVar(&config.ip, "ip", "", "return sites hosted by specific ip")
 	flag.BoolVar(&config.json, "j", false, "print json results to stdout")
 	flag.StringVar(&config.notsite, "notsite", "", "site/domain to exclude")
 	flag.StringVar(&config.not, "not", "", "term(s) to exclude")

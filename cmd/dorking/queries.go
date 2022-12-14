@@ -10,14 +10,11 @@ import (
 type queryData struct {
 	base     string
 	contains string
-	ext      string
 	feed     string
 	filetype string
-	hasfeed  string
 	inbody   string
 	intitle  string
 	inurl    string
-	ip       string
 	name     string
 	not      string
 	notsite  string
@@ -34,17 +31,14 @@ func (d *dorking) getQueryData() []queryData {
 	bing := queryData{
 		base:     "https://bing.com/search?q=",
 		contains: "contains%3A",
-		ext:      "ext%3A",
 		feed:     "feed%3A",
 		filetype: "filetype%3A",
-		hasfeed:  "hasfeed%3A",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inanchor%3A",
-		ip:       "ip%3A",
 		name:     "bing",
-		notsite:  "-site%3A",
 		not:      "-",
+		notsite:  "-site%3A",
 		or:       "OR",
 		site:     "site%3A",
 		spacer:   "+",
@@ -54,24 +48,30 @@ func (d *dorking) getQueryData() []queryData {
 	// assembled from poking around...
 	brave := queryData{
 		base:    "https://search.brave.com/search?q=",
+		feed:     "feed%3A",
+		filetype: "filetype%3A",
+		inbody:   "inbody%3A",
+		intitle:  "intitle%3A",
 		inurl:   "inurl%3A",
 		name:    "brave",
-		notsite: "-site:%3A",
 		not:     "-",
+		notsite:  "-site%3A",
 		or:      "OR",
-		site:    "site:%3A",
+		site:    "site%3A",
 		spacer:  "+",
 	}
 
 	// quack quack quack mr ducksworth
 	ddg := queryData{
 		base:     "https://html.duckduckgo.com/html?q=",
+		feed:     "feed%3A",
 		filetype: "filetype%3A",
+		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
-		inurl:    "inurl%3A",
+		inurl:    "inanchor%3A",
 		name:     "duckduckgo",
-		notsite:  "-site%3A",
 		not:      "-",
+		notsite:  "-site%3A",
 		or:       "OR",
 		site:     "site%3A",
 		spacer:   "+",
@@ -81,11 +81,14 @@ func (d *dorking) getQueryData() []queryData {
 	// just specifying within p works...
 	yahoo := queryData{
 		base:     "https://search.yahoo.com/search?p=",
+		feed:     "feed%3A",
 		filetype: "filetype%3A",
+		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
-		inurl:    "inurl%3A",
+		inurl:    "inanchor%3A",
 		name:     "yahoo",
 		not:      "-",
+		notsite:  "-site%3A",
 		or:       "OR",
 		site:     "site%3A",
 		spacer:   "+",
@@ -118,10 +121,6 @@ func (d *dorking) makeQueryStrings() []string {
 			contains := fmt.Sprintf("%s%s", qd.contains, d.config.contains)
 			components = append(components, contains)
 		}
-		if d.config.ext != "" && qd.ext != "" {
-			ext := fmt.Sprintf("%s%s", qd.ext, d.config.ext)
-			components = append(components, ext)
-		}
 		if d.config.feed != "" && qd.feed != "" {
 			feed := fmt.Sprintf("%s%s", qd.feed, d.config.feed)
 			components = append(components, feed)
@@ -129,10 +128,6 @@ func (d *dorking) makeQueryStrings() []string {
 		if d.config.filetype != "" && qd.filetype != "" {
 			filetype := fmt.Sprintf("%s%s", qd.filetype, d.config.filetype)
 			components = append(components, filetype)
-		}
-		if d.config.hasfeed != "" && qd.hasfeed != "" {
-			hasfeed := fmt.Sprintf("%s%s", qd.hasfeed, d.config.hasfeed)
-			components = append(components, hasfeed)
 		}
 		if d.config.inbody != "" && qd.inbody != "" {
 			inbody := fmt.Sprintf("%s%s", qd.inbody, d.config.inbody)
@@ -145,10 +140,6 @@ func (d *dorking) makeQueryStrings() []string {
 		if d.config.inurl != "" && qd.inurl != "" {
 			inurl := fmt.Sprintf("%s%s", qd.inurl, d.config.inurl)
 			components = append(components, inurl)
-		}
-		if d.config.ip != "" && qd.ip != "" {
-			ip := fmt.Sprintf("%s%s", qd.ip, d.config.ip)
-			components = append(components, ip)
 		}
 		if d.config.not != "" && qd.not != "" {
 			cleanedQuery = strings.Replace(d.config.not, " ", qd.spacer, -1)
