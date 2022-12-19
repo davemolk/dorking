@@ -3,12 +3,14 @@
 advanced searching with bing, brave, duck duck go, and yahoo
 
 ## Overview
-Google dorking is great, but Google's recaptchas etc are less great. Use dorking to search bing, brave, duck duck go, and yahoo instead, all off a single advanced search query. By default, dorking prints the results (url and blurb) to stdout, but you can change to json with a flag and/or save the results to a file. I'm hoping to add more search options when I have time. Great!
+Google dorking is great, but Google's recaptchas etc are less great. Use dorking to search bing, brave, duck duck go, and yahoo instead, all off a single advanced search query. By default, dorking prints the results (url and blurb) to stdout, but you can change to a json output with a flag and/or save the results to a file. 
+
+I plan to keep adding query features if/when I have time, so stay tuned.
 
 ## Examples
 ```
-dorking -filetype pdf -q goroutines
-(json results truncated)
+dorking -filetype pdf -q goroutines -j
+(json results truncated for space reasons)
 {
     "http://mesl.ucsd.edu/pubs/zhou_SIGBED16.pdf": "Go language’s concurrency is enabled through goroutines and invoked with keyword go. A user creates a goroutine and associates it with a program using go func(arg). After creation, go runtime scheduler automatically allocates gor-outines to run on OS threads.",
     "http://www.cs.uky.edu/~raphael/grad/keepingCurrent/roberts-concurrency.pdf": "Goroutines Goroutines enable concurrency Like threads, but lighter Spawn one by prefixing a function call with the go keyword Similar to backgrounding a process in Linux Scheduled onto OS threads by the Go runtime Goroutines share an address space, but sharing data structures is not idiomatic.",
@@ -27,6 +29,8 @@ go install github.com/davemolk/dorking/cmd/dorking@latest
 # Additional Notes
 * Some of the operators work better than others. 
 
+* Command-line operators are translated as needed to each particular search engine. For instance, while bing reads *inurl* as *inurl*, dorking translates it to *inanchor* for duck duck go.
+
 * Brave doesn't publish advanced query info (at least that I found), so what's there is from me poking around.
 
 * Bing's reported operators can be unreliable (ext, hasfeed, ip, and info don't seem to work, so I've excluded them).
@@ -35,6 +39,7 @@ go install github.com/davemolk/dorking/cmd/dorking@latest
 
 
 ## Flags
+I decided to keep these as close to what you'd enter into a search bar as possible.
 ```
 Usage of dorking:
   -contains string
