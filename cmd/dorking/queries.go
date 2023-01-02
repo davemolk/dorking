@@ -68,7 +68,7 @@ func (d *dorking) getQueryData() []queryData {
 		filetype: "filetype%3A",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
-		inurl:    "inanchor%3A",
+		inurl:    "inurl%3A",
 		name:     "duckduckgo",
 		not:      "-",
 		notsite:  "-site%3A",
@@ -137,8 +137,10 @@ func (d *dorking) makeQueryStrings() []string {
 			intitle := fmt.Sprintf("%s%s", qd.intitle, d.config.intitle)
 			components = append(components, intitle)
 		}
+		// ddg needs the url enclosed in double quotes to work properly, and the search
+		// results from the other three search engines aren't adversely impacted by the quotes.
 		if d.config.inurl != "" && qd.inurl != "" {
-			inurl := fmt.Sprintf("%s%s", qd.inurl, d.config.inurl)
+			inurl := fmt.Sprintf("%s%s%s%s", qd.inurl, `"`, d.config.inurl, `"`)
 			components = append(components, inurl)
 		}
 		if d.config.not != "" && qd.not != "" {

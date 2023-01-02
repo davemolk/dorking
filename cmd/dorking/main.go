@@ -76,7 +76,7 @@ func main() {
 			b, err := d.makeRequest(s.url)
 			if err != nil {
 				if d.config.verbose {
-					errorLog.Printf("unable to make request for %s\n", s.name)
+					errorLog.Printf("unable to make request for %s: %v\n", s.name, err)
 				}
 				return
 			}
