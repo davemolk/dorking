@@ -37,6 +37,8 @@ go install github.com/davemolk/dorking/cmd/dorking@latest
 
 * While Yahoo has a special query system (v*_vt, for instance), just using p seems to work, so I stuck with that.
 
+* Avoiding bot detection...each request gets a randomly assigned user agent corresponding to your os as well as appropriate headers (50/50 chance of chrome or firefox). That being said, Go unfortunately doesn't preserve header order, so if that's important to you, you're going to have to look elsewhere.
+
 
 ## Flags
 I decided to keep these as close to what you'd enter into a search bar as possible.
@@ -62,6 +64,8 @@ Usage of dorking:
     	site/domain to exclude
   -or string
     	OR term(s)
+  -os string
+    	operating system (used to spoof user agent)
   -q string
     	search query
   -site string

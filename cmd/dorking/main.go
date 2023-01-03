@@ -21,6 +21,7 @@ type config struct {
 	not      string
 	notsite  string
 	or       string
+	os string
 	query    string
 	site     string
 	timeout  int
@@ -48,6 +49,7 @@ func main() {
 	flag.StringVar(&config.notsite, "notsite", "", "site/domain to exclude")
 	flag.StringVar(&config.not, "not", "", "term(s) to exclude")
 	flag.StringVar(&config.or, "or", "", "OR term(s)")
+	flag.StringVar(&config.os, "os", "w", "operating system (w or m)")
 	flag.StringVar(&config.query, "q", "", "search query")
 	flag.StringVar(&config.site, "site", "", "site/domain to search")
 	flag.IntVar(&config.timeout, "t", 5000, "timeout for request")
