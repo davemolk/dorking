@@ -65,7 +65,7 @@ Usage of dorking:
   -or string
     	OR term(s)
   -os string
-    	operating system (used to spoof user agent)
+    	operating system (used in user agent and header creation)
   -q string
     	search query
   -site string

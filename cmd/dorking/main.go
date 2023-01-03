@@ -21,7 +21,7 @@ type config struct {
 	not      string
 	notsite  string
 	or       string
-	os string
+	os       string
 	query    string
 	site     string
 	timeout  int
