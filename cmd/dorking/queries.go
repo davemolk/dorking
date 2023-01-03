@@ -12,7 +12,6 @@ type queryData struct {
 	contains string
 	feed     string
 	filetype string
-	host string
 	inbody   string
 	intitle  string
 	inurl    string
@@ -34,7 +33,6 @@ func (d *dorking) getQueryData() []queryData {
 		contains: "contains%3A",
 		feed:     "feed%3A",
 		filetype: "filetype%3A",
-		host: "www.bing.com",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inanchor%3A",
@@ -52,7 +50,6 @@ func (d *dorking) getQueryData() []queryData {
 		base:    "https://search.brave.com/search?q=",
 		feed:     "feed%3A",
 		filetype: "filetype%3A",
-		host: "search.brave.com",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
 		inurl:   "inurl%3A",
@@ -69,7 +66,6 @@ func (d *dorking) getQueryData() []queryData {
 		base:     "https://html.duckduckgo.com/html?q=",
 		feed:     "feed%3A",
 		filetype: "filetype%3A",
-		host: "duckduckgo.com",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inurl%3A",
@@ -87,7 +83,6 @@ func (d *dorking) getQueryData() []queryData {
 		base:     "https://search.yahoo.com/search?p=",
 		feed:     "feed%3A",
 		filetype: "filetype%3A",
-		host: "search.yahoo.com",
 		inbody:   "inbody%3A",
 		intitle:  "intitle%3A",
 		inurl:    "inanchor%3A",
