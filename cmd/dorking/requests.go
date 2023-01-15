@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -41,14 +42,21 @@ func (d *dorking) makeRequest(url string) (*bytes.Buffer, error) {
 		return nil, fmt.Errorf("HTTP response: %d for %s", resp.StatusCode, url)
 	}
 
-	b, err := io.ReadAll(resp.Body)
+	g, err := gzip.NewReader(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read body for %s: %v", url, err)
+		return nil, fmt.Errorf("unable to decode gzip for %s: %w", url, err)
 	}
+
+	b, err := io.ReadAll(g)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read body for %s: %v", url, err)
+	}
+	
 	buf := bytes.NewBuffer(b)
 	return buf, nil
 }
 
+// headers randomly adds firefox or chrome headers to the request.
 func (d *dorking) headers(r *http.Request) *http.Request {
 	if rand.Intn(2) == 1 {
 		return d.ff(r)
@@ -56,13 +64,14 @@ func (d *dorking) headers(r *http.Request) *http.Request {
 	return d.chrome(r)
 }
 
+// ff returns a request with firefox headers added.
 func (d *dorking) ff(r *http.Request) *http.Request {
 	uAgent := d.ffUA()
 	r.Header.Set("Host", r.URL.Host)
 	r.Header.Set("User-Agent", uAgent)
 	r.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
 	r.Header.Set("Accept-Language", "en-US,en;q=0.5")
-	r.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	r.Header.Set("Accept-Encoding", "gzip")
 	r.Header.Set("DNT", "1")
 	r.Header.Set("Connection", "keep-alive")
 	r.Header.Set("Upgrade-Insecure-Requests", "1")
@@ -74,6 +83,7 @@ func (d *dorking) ff(r *http.Request) *http.Request {
 	return r
 }
 
+// chrome returns a request with chrome headers added.
 func (d *dorking) chrome(r *http.Request) *http.Request {
 	uAgent := d.chromeUA()
 	r.Header.Set("Host", r.URL.Host)
@@ -94,11 +104,12 @@ func (d *dorking) chrome(r *http.Request) *http.Request {
 	r.Header.Set("Sec-Fetch-Mode", "navigate")
 	r.Header.Set("Sec-Fetch-User", "?1")
 	r.Header.Set("Sec-Fetch-Dest", "document")
-	r.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	r.Header.Set("Accept-Encoding", "gzip")
 	r.Header.Set("Accept-Language", "en-US,en;q=0.5")
 	return r
 }
 
+// ffUA returns a randomly selected firefox user agent.
 func (d *dorking) ffUA() string {
 	var userAgents []string
 	switch d.config.os {
@@ -123,6 +134,7 @@ func (d *dorking) ffUA() string {
 	return userAgents[random]
 }
 
+// chromeUA returns a randomly selected chrome user agent.
 func (d *dorking) chromeUA() string {
 	var userAgents []string
 	switch d.config.os {
